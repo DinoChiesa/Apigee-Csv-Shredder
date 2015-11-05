@@ -40,16 +40,16 @@ These jars must be available on the classpath for the compile to
 succeed. Using maven to build via the pom.xml file will download all of these files for
 you, automatically. 
 
-If you want to download them manually: 
+### If for some reason you want to download these dependencies manually: 
 
-    The first 2 jars are available in Apigee Edge. The first two are
-    produced by Apigee; contact Apigee support to obtain these jars to allow
-    the compile, or get them here: 
-    https://github.com/apigee/api-platform-samples/tree/master/doc-samples/java-cookbook/lib
+The first 2 jars are available in Apigee Edge. The first two are
+produced by Apigee; contact Apigee support to obtain these jars to allow
+the compile, or get them here: 
+https://github.com/apigee/api-platform-samples/tree/master/doc-samples/java-cookbook/lib
 
-    The Apache commons lang jar is implicitly available in Apigee Edge at runtime, therefore in the pom.xml, the jar is marked with "compile" scope. If for some reason you want to download this jar, you can get it from maven.org. The commons csv is not implicitly available in Edge; in the pom file, it is not marked as "compile" scope. 
+The Apache commons lang jar is implicitly available in Apigee Edge at runtime, therefore in the pom.xml, the jar is marked with "compile" scope. You can download it from maven.org. The commons csv is not implicitly available in Edge; in the pom file, it is not marked as "compile" scope. 
 
-    The Jackson jar is similarly available from the public maven.org repo. JAckson is not marked with compile scope in the pom.xml. 
+The Jackson jar is similarly available from the public maven.org repo. JAckson is not marked with compile scope in the pom.xml. 
 
 
 ## Notes
