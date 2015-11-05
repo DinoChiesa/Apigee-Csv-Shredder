@@ -7,7 +7,7 @@ compile a Java callout for Apigee Edge.  The callout shreds a CSV, returns a Jav
 
 1. unpack (if you can read this, you've already done that).
 
-2. configure the build on your machine by loading the Apigee jars into your local cache
+2. configure the build on your machine by loading the Apigee jars into your local cache  
   ```./buildsetup.sh```
 
 3. Build with maven.  
@@ -33,12 +33,12 @@ compile a Java callout for Apigee Edge.  The callout shreds a CSV, returns a Jav
 - Apigee Edge expressions v1.0
 - Apigee Edge message-flow v1.0
 - Apache commons lang 2.6
-- FasterXML Jackson
+- Apache commons csv 1.2
+- FasterXML Jackson 2.5.0
 
 These jars must be available on the classpath for the compile to
-succeed. The build.sh script should download all of these files for
-you, automatically. You could also create a Gradle or maven pom file as
-well. 
+succeed. Using maven to build via the pom.xml file will download all of these files for
+you, automatically. 
 
 If you want to download them manually: 
 
@@ -47,9 +47,9 @@ If you want to download them manually:
     the compile, or get them here: 
     https://github.com/apigee/api-platform-samples/tree/master/doc-samples/java-cookbook/lib
 
-    The Apache jar is available in Apigee Edge at runtime. To download it for compile time, you can get them from maven.org. 
+    The Apache commons lang jar is implicitly available in Apigee Edge at runtime, therefore in the pom.xml, the jar is marked with "compile" scope. If for some reason you want to download this jar, you can get it from maven.org. The commons csv is not implicitly available in Edge; in the pom file, it is not marked as "compile" scope. 
 
-    The Jackson jar is available from your favorite public maven repo. 
+    The Jackson jar is similarly available from the public maven.org repo. JAckson is not marked with compile scope in the pom.xml. 
 
 ## Notes
 
