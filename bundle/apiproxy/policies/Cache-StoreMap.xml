@@ -1,0 +1,23 @@
+<PopulateCache name='Cache-StoreMap'>
+  <CacheResource>csv-cache</CacheResource>
+  <Source>csv_result_java</Source>
+  <Scope>Application</Scope>
+  <CacheKey>
+    <Prefix>csv</Prefix>
+    <KeyFragment ref='request.queryparam.name'/>
+  </CacheKey>
+  <ExpirySettings>
+    <!--
+
+      include one of the following...
+
+    <TimeOfDay ref='time_variable'>hh:mm:ss</TimeOfDay>
+    <TimeoutInSec ref='duration_variable'>864000</TimeoutInSec>  <- 864000 = 10 days ->
+    <ExpiryDate ref='date_variable'>mm-dd-yyyy</ExpiryDate>
+
+    -->
+
+    <TimeoutInSec ref='duration_variable'>864000</TimeoutInSec>  <!-- 864000 = 10 days -->
+
+  </ExpirySettings>
+</PopulateCache>

@@ -1,0 +1,9 @@
+<JavaCallout name='Java-ShredCsv'>
+  <Properties>
+    <!-- this resolves to a comma-separated list of field names. -->
+    <!-- Should be synchronized with the fields in the CSV passed as POST data -->
+    <Property name="fieldlist">{request.queryparam.fieldlist}</Property>
+  </Properties>
+  <ClassName>com.dinochiesa.edgecallouts.CsvShredder</ClassName>
+  <ResourceURL>java://edge-csv-parse-callout.jar</ResourceURL>
+</JavaCallout>

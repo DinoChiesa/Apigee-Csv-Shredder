@@ -1,0 +1,7 @@
+<AssignMessage name='AssignMessage-ClearResponse'>
+  <DisplayName>AssignMessage - Clear Msg</DisplayName>
+  <Remove>
+    <Headers/>
+  </Remove>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

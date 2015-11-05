@@ -1,0 +1,12 @@
+<AssignMessage name='AssignMessage-QueryResponse'>
+  <Set>
+      <Payload contentType='application/json'
+               variablePrefix='%'
+               variableSuffix='#'><![CDATA[{
+  "status": "ok",
+  "data": %csv_result_json#
+}
+]]></Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

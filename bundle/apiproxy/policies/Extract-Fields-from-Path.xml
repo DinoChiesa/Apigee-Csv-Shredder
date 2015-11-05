@@ -1,0 +1,6 @@
+<ExtractVariables name="Extract-Fields-from-Path">
+   <VariablePrefix>extracted</VariablePrefix>
+   <URIPath>
+      <Pattern ignoreCase="true">/field/{mapname}/{fieldname}</Pattern>
+   </URIPath>
+</ExtractVariables>

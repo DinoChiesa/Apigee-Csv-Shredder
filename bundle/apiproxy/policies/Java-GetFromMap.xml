@@ -1,0 +1,8 @@
+<JavaCallout name='Java-GetFromMap'>
+  <Properties>
+    <Property name="fieldnameVariable">extracted.fieldname</Property>
+    <Property name="mapVariable">csv_map</Property>
+  </Properties>
+  <ClassName>com.dinochiesa.edgecallouts.MapExtractor</ClassName>
+  <ResourceURL>java://edge-csv-parse-callout.jar</ResourceURL>
+</JavaCallout>

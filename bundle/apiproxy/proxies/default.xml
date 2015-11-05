@@ -1,0 +1,79 @@
+<ProxyEndpoint name='default'>
+  <Description>Proxy for Java callout demonstrations</Description>
+  <HTTPProxyConnection>
+    <BasePath>/csv-shredder</BasePath>
+    <Properties/>
+    <VirtualHost>default</VirtualHost>
+    <VirtualHost>secure</VirtualHost>
+  </HTTPProxyConnection>
+
+  <FaultRules/>
+
+  <PreFlow name="PreFlow">
+      <Request/>
+      <Response>
+        <Step><Name>AssignMessage-ClearResponse</Name></Step>
+      </Response>
+  </PreFlow>
+
+  <PostFlow name="PostFlow">
+      <Request/>
+      <Response>
+        <Step><Name>Javascript-EmitElapsed</Name></Step>
+      </Response>
+  </PostFlow>
+
+  <Flows>
+    <Flow name='shred'>
+      <Description>shred a CSV</Description>
+      <Request>
+        <Step>
+          <Name>RaiseFault-InvalidRequest</Name>
+          <Condition>request.queryparam.name = null</Condition>
+        </Step>
+        <Step><Name>Java-ShredCsv</Name></Step>
+        <Step><Name>Cache-StoreMap</Name></Step>
+      </Request>
+      <Response>
+        <Step><Name>AssignMessage-StoreResponse</Name></Step>
+      </Response>
+      <Condition>(proxy.pathsuffix ~ "/shred") and (request.verb = "POST")</Condition>
+    </Flow>
+
+
+    <Flow name='query'>
+      <Description>retrieve a datafield from the cached object</Description>
+      <Request>
+        <Step><Name>Extract-Fields-from-Path</Name></Step>
+        <Step>
+          <Name>RaiseFault-InvalidRequest</Name>
+          <Condition>extracted.mapname = null</Condition>
+        </Step>
+        <Step><Name>Cache-RetrieveMap</Name></Step>
+        <Step><Name>Java-GetFromMap</Name></Step>
+      </Request>
+      <Response>
+        <Step><Name>AssignMessage-QueryResponse</Name></Step>
+      </Response>
+      <Condition>(proxy.pathsuffix ~~ "/field/[^\/]+/[^\/]+") and (request.verb = "GET")</Condition>
+    </Flow>
+
+    <Flow name='unknown'>
+      <!--
+           applies as a "default" flow, in case none of the conditions
+           for the above flows evaluated to true.
+      -->
+      <Description>Unknown request</Description>
+      <Request>
+        <Step><Name>RaiseFault-UnknownRequest</Name></Step>
+      </Request>
+      <Response/>
+    </Flow>
+
+  </Flows>
+
+  <RouteRule name='LoopbackRoute'>
+    <!-- no target! no backend call -->
+  </RouteRule>
+
+</ProxyEndpoint>
