@@ -77,7 +77,7 @@ For example, the super-simple.csv file has these contents:
    G,H,I
 ```
 
-to shred that csv, use this command:
+To shred that csv, use this command:
 
 ```
   curl -i -X POST \
@@ -96,14 +96,14 @@ The cache will then hold a Map with 3 key/value pairs. it will look like this:
      A => { field1 => B, field2 => C, PK => A },
      D => { field1 => E, field2 => F, PK => D },
      G => { field1 => H, field2 => I, PK => G }
-  }```
-
+  }
+```
 
 To query the map, you must specify the map name, and the "primary key", both of which are passed as url path elements. 
 
 For example, 
 
-  ```curl -i http://demo28-prod.apigee.net/csv-shredder/field/simple/A```
+```curl -i http://demo28-prod.apigee.net/csv-shredder/field/simple/A```
 
 result: 
 ```
