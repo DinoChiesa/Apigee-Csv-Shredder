@@ -7,7 +7,7 @@ compile a Java callout for Apigee Edge.  The callout shreds a CSV, returns a Jav
 
 1. unpack (if you can read this, you've already done that).
 
-2. configure the build on your machine by loading the Apigee jars into your local cache  
+2. configure the build on your machine by loading the Apigee jars into your local cache.   
   ```./buildsetup.sh```
 
 3. Build with maven.  
