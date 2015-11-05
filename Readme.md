@@ -51,6 +51,7 @@ If you want to download them manually:
 
     The Jackson jar is similarly available from the public maven.org repo. JAckson is not marked with compile scope in the pom.xml. 
 
+
 ## Notes
 
 The shredder produces a Java object of type Map<String,Map<String,String>>
@@ -84,6 +85,9 @@ to shred that csv, use this command:
     http://demo28-prod.apigee.net/csv-shredder/shred?name=simple \
      --data-binary @super-simple.csv
 ```
+
+Notice that the file is specified to curl with --data-binary. If you use -d or --data-ascii, curl will eliminate newlines, which will cause the CSV to be mangled before it is sent to the API Proxy. 
+
 
 The cache will then hold a Map with 3 key/value pairs. it will look like this: 
 
