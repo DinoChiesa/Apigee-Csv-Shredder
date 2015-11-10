@@ -1,7 +1,17 @@
 # Csv Shredder Java Callout 
 
 This directory contains the Java source code and pom.xml file required to
-compile a Java callout for Apigee Edge.  The callout shreds a CSV, returns a Java map, and returns success.
+compile a pair of Java callouts for Apigee Edge.  The first callout shreds a CSV, returns a Java map object, and returns success.  The second callout retrieves items from a Java Map object, by key.
+
+These callouts can work together, demonstrating:
+
+1. how to parse a CSV within Apigee Edge
+
+2. how to store a Java object in the Edge cache
+
+3. How to retrieve a Java object from Cache, and then parse the object on subsequent API calls
+
+ 
 
 ## Building:
 
@@ -11,20 +21,25 @@ compile a Java callout for Apigee Edge.  The callout shreds a CSV, returns a Jav
   ```bash ./buildsetup.sh```
 
 3. Build with maven.  
-  ```mvn clean package```
+  ```mvn clean package```  
+  
+  The above will copy the generated JAR and its dependencies to the bundle directory.  
 
-4. The above will copy the generated JAR and its dependencies to the bundle directory.  Now deploy the API Proxy bundle with, Eg,    
-   ```./pushapi -v -d -o demo28 -e prod -n csv-shredder bundle```
+4. create a cache in the Apigee Edge environment called 'cache-1'.  This is used by the 
+demonstration apiproxy.  You can use the Admin UI to do so. 
 
-5. Use a client to load a CSV into the cache, via the proxy. Eg,   
+5. Now deploy the API Proxy bundle with, Eg,    
+   ```./pushapi -v -d -o ORGNAME -e prod -n csv-shredder bundle```
+
+6. Use a client to load a CSV into the cache, via the proxy. Eg,   
    ```curl -i -X POST \ 
        -H content-type:text/csv \
-       http://demo28-prod.apigee.net/csv-shredder/shred?name=sample \
+       http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sample \
        --data-binary @sample.csv```
 
-6. Use a client to query from the cache, via the proxy. Eg,   
+7. Use a client to query from the cache, via the proxy. Eg,   
    ```curl -i -X GET \ 
-       http://demo28-prod.apigee.net/csv-shredder/shred/sample/PRIMARY_KEY```
+       http://ORGNAME-prod.apigee.net/csv-shredder/shred/sample/PRIMARY_KEY```
 
 
 
@@ -82,7 +97,7 @@ To shred that csv, use this command:
 ```
   curl -i -X POST \
     -H content-type:text/csv \
-    http://demo28-prod.apigee.net/csv-shredder/shred?name=simple \
+    http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=simple \
      --data-binary @super-simple.csv
 ```
 
@@ -103,7 +118,7 @@ To query the map, you must specify the map name, and the "primary key", both of 
 
 For example, 
 
-```curl -i http://demo28-prod.apigee.net/csv-shredder/field/simple/A```
+```curl -i http://ORGNAME-prod.apigee.net/csv-shredder/field/simple/A```
 
 result: 
 ```
@@ -125,7 +140,7 @@ shred:
 ```
   curl -i -X POST \
     -H content-type:text/csv \
-    http://demo28-prod.apigee.net/csv-shredder/shred?name=sacramento \
+    http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sacramento \
      --data-binary @Sacramento-RealEstate-Transactions.csv
 ```
 
@@ -134,7 +149,7 @@ shred:
 
 query: 
 
-  ```curl -i "http://demo28-prod.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"```
+  ```curl -i "http://ORGNAME-prod.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"```
 
 result:
 
