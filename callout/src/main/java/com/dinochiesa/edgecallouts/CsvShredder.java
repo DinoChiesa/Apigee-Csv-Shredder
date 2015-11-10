@@ -85,11 +85,14 @@ public class CsvShredder implements Execution {
         String varName = null;
         try {
             List<String> list = getFieldList(msgCtxt);
+
+            // 1. we want to read the content as a stream
             InputStreamReader in = new InputStreamReader(msg.getContentAsStream());
 
             // see info for handling header records here:
             // https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html
 
+            // 2. read the CSV, maybe treat the first line as a header
             Map<String, Object> map = new HashMap<String, Object>();
             Iterable<CSVRecord> records = null;
             if (list == null) {
@@ -99,20 +102,20 @@ public class CsvShredder implements Execution {
                 records = CSVFormat.DEFAULT.withHeader(list.toArray(new String[1])).parse(in);
             }
 
+            // 3. process each record in the CSV, convert to an element in a map
             for (CSVRecord record : records) {
                 // assume first field is the primary key
                 String firstField = record.get(0);
-                map.put(firstField, record.toMap());
+                map.put(firstField, record.toMap());  // Map<String,String>
             }
 
-            // set a variable to hold the Map<String, Map>
+            // 4. set a variable to hold the generated Map<String, Map>
             msgCtxt.setVariable(varprefix + "result_java", map);
 
+            // 5. for diagnostic purposes, serialize to JSON as well
             String jsonResult = om.writer()
                 .withDefaultPrettyPrinter()
                 .writeValueAsString(map);
-
-            // set another variable to hold the json representation
             msgCtxt.setVariable(varprefix + "result_json", jsonResult);
         }
         catch (java.lang.Exception exc1) {
