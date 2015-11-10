@@ -49,7 +49,7 @@ https://github.com/apigee/api-platform-samples/tree/master/doc-samples/java-cook
 
 The Apache commons lang jar is implicitly available in Apigee Edge at runtime, therefore in the pom.xml, the jar is marked with "compile" scope. You can download it from maven.org. The commons csv is not implicitly available in Edge; in the pom file, it is not marked as "compile" scope. 
 
-The Jackson jar is similarly available from the public maven.org repo. JAckson is not marked with compile scope in the pom.xml. 
+The Jackson jar is similarly available from the public maven.org repo. Jackson is not marked with compile scope in the pom.xml. 
 
 
 ## Notes
@@ -129,9 +129,8 @@ shred:
      --data-binary @Sacramento-RealEstate-Transactions.csv
 ```
 
-I got this sample CSV data from 
-  https://support.spatialkey.com/spatialkey-sample-csv-data/
-
+(I got this sample CSV data for Sacramento real estate transactions from SpatialKey: 
+  https://support.spatialkey.com/spatialkey-sample-csv-data/)
 
 query: 
 

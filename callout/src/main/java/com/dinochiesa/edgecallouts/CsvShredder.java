@@ -116,7 +116,7 @@ public class CsvShredder implements Execution {
             msgCtxt.setVariable(varprefix + "result_json", jsonResult);
         }
         catch (java.lang.Exception exc1) {
-            exc1.printStackTrace();
+            //exc1.printStackTrace(); // will go to stdout of message processor
             varName = varprefix + "error";
             msgCtxt.setVariable(varName, exc1.getMessage());
             varName = varprefix + "stacktrace";
