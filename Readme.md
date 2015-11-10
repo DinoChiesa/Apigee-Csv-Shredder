@@ -25,7 +25,7 @@ These callouts can work together, demonstrating:
   
   The above will copy the generated JAR and its dependencies to the bundle directory.  
 
-4. create a cache in the Apigee Edge environment called 'cache-1'.  This is used by the 
+4. create a cache in the Apigee Edge environment called 'csv-cache'.  This is used by the 
 demonstration apiproxy.  You can use the Admin UI to do so. 
 
 5. Now deploy the API Proxy bundle with, Eg,    
@@ -98,7 +98,7 @@ To shred that csv, use this command:
   curl -i -X POST \
     -H content-type:text/csv \
     http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=simple \
-     --data-binary @super-simple.csv
+     --data-binary @csv/super-simple.csv
 ```
 
 Notice that the file is specified to curl with --data-binary. If you use -d or --data-ascii, curl will eliminate newlines, which will cause the CSV to be mangled before it is sent to the API Proxy. 
@@ -141,7 +141,7 @@ shred:
   curl -i -X POST \
     -H content-type:text/csv \
     http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sacramento \
-     --data-binary @Sacramento-RealEstate-Transactions.csv
+     --data-binary @csv/Sacramento-RealEstate-Transactions.csv
 ```
 
 (I got this sample CSV data for Sacramento real estate transactions from SpatialKey: 
@@ -149,7 +149,7 @@ shred:
 
 query: 
 
-  ```curl -i "http://ORGNAME-prod.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"```
+```curl -i "http://ORGNAME-prod.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"```
 
 result:
 
