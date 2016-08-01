@@ -32,13 +32,13 @@ demonstration apiproxy.  You can use the Admin UI to do so.
    ```./pushapi -v -d -o ORGNAME -e prod -n csv-shredder bundle```
 
 6. Use a client to load a CSV into the cache, via the proxy. Eg,   
-   ```curl -i -X POST \ 
-       -H content-type:text/csv \
-       http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sample \
+   ```curl -i -X POST    
+       -H content-type:text/csv   
+       http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sample   
        --data-binary @sample.csv```
 
 7. Use a client to query from the cache, via the proxy. Eg,   
-   ```curl -i -X GET \ 
+   ```curl -i -X GET   
        http://ORGNAME-prod.apigee.net/csv-shredder/shred/sample/PRIMARY_KEY```
 
 
@@ -172,6 +172,11 @@ result:
   }
 }
 ```
+
+## LICENSE
+
+This material is copyright 2016 Apigee Corp. 
+This is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file. 
 
 
 ## Bugs
