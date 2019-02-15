@@ -11,14 +11,14 @@
   <PreFlow name="PreFlow">
     <Request/>
     <Response>
-      <Step><Name>AssignMessage-ClearResponse</Name></Step>
+      <Step><Name>AM-ClearResponse</Name></Step>
     </Response>
   </PreFlow>
 
   <PostFlow name="PostFlow">
     <Request/>
     <Response>
-      <Step><Name>Javascript-EmitElapsed</Name></Step>
+      <Step><Name>JS-EmitElapsed</Name></Step>
     </Response>
   </PostFlow>
 
@@ -27,14 +27,14 @@
       <Description>shred a CSV</Description>
       <Request>
         <Step>
-          <Name>RaiseFault-InvalidRequest</Name>
+          <Name>RF-InvalidRequest</Name>
           <Condition>request.queryparam.name = null</Condition>
         </Step>
         <Step><Name>Java-ShredCsv</Name></Step>
         <Step><Name>Cache-StoreMap</Name></Step>
       </Request>
       <Response>
-        <Step><Name>AssignMessage-StoreResponse</Name></Step>
+        <Step><Name>AM-StoreResponse</Name></Step>
       </Response>
       <Condition>(proxy.pathsuffix ~ "/shred") and (request.verb = "POST")</Condition>
     </Flow>
@@ -45,14 +45,14 @@
       <Request>
         <Step><Name>Extract-Fields-from-Path</Name></Step>
         <Step>
-          <Name>RaiseFault-InvalidRequest</Name>
+          <Name>RF-InvalidRequest</Name>
           <Condition>extracted.mapname = null</Condition>
         </Step>
         <Step><Name>Cache-RetrieveMap</Name></Step>
         <Step><Name>Java-GetFromMap</Name></Step>
       </Request>
       <Response>
-        <Step><Name>AssignMessage-QueryResponse</Name></Step>
+        <Step><Name>AM-QueryResponse</Name></Step>
       </Response>
       <Condition>(proxy.pathsuffix ~~ "/field/[^\/]+/[^\/]+") and (request.verb = "GET")</Condition>
     </Flow>
@@ -64,7 +64,7 @@
       -->
       <Description>Unknown request</Description>
       <Request>
-        <Step><Name>RaiseFault-UnknownRequest</Name></Step>
+        <Step><Name>RF-UnknownRequest</Name></Step>
       </Request>
       <Response/>
     </Flow>

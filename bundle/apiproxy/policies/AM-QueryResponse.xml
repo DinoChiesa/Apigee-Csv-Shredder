@@ -1,0 +1,10 @@
+<AssignMessage name='AM-QueryResponse'>
+  <Set>
+      <Payload contentType='application/json'>{
+  "status": "ok",
+  "data": {csv_result_json}
+}
+</Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>

@@ -5,5 +5,5 @@
     <Property name="fieldlist">{request.queryparam.fieldlist}</Property>
   </Properties>
   <ClassName>com.dinochiesa.edgecallouts.CsvShredder</ClassName>
-  <ResourceURL>java://edge-csv-parse-callout.jar</ResourceURL>
+  <ResourceURL>java://edge-csv-parse-callout-1.0.1.jar</ResourceURL>
 </JavaCallout>

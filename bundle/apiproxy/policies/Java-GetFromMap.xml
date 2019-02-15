@@ -4,5 +4,5 @@
     <Property name="mapVariable">csv_map</Property>
   </Properties>
   <ClassName>com.dinochiesa.edgecallouts.MapExtractor</ClassName>
-  <ResourceURL>java://edge-csv-parse-callout.jar</ResourceURL>
+  <ResourceURL>java://edge-csv-parse-callout-1.0.1.jar</ResourceURL>
 </JavaCallout>

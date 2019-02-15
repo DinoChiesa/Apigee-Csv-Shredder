@@ -1,0 +1,9 @@
+<AssignMessage name='AM-StoreResponse'>
+  <Set>
+      <Payload contentType='application/json'>{
+  "mapname": "{request.queryparam.name}"
+}
+</Payload>
+  </Set>
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+</AssignMessage>
