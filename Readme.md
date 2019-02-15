@@ -1,4 +1,4 @@
-# Csv Shredder Java Callout 
+# Csv Shredder Java Callout
 
 This directory contains the Java source code and pom.xml file required to
 compile a pair of Java callouts for Apigee Edge.  The first callout shreds a CSV, returns a Java map object, and returns success.  The second callout retrieves items from a Java Map object, by key.
@@ -11,77 +11,58 @@ These callouts can work together, demonstrating:
 
 3. How to retrieve a Java object from Cache, and then parse the object on subsequent API calls
 
- 
 
-## Building:
+## Disclaimer
 
-1. unpack (if you can read this, you've already done that).
+This example is not an official Google product, nor is it part of an official Google product.
 
-2. configure the build on your machine by loading the Apigee jars into your local cache.   
-  ```bash ./buildsetup.sh```
 
-3. Build with maven.  
-  ```mvn clean package```  
-  
-  The above will copy the generated JAR and its dependencies to the bundle directory.  
+## Using this policy
 
-4. create a cache in the Apigee Edge environment called 'csv-cache'.  This is used by the 
-demonstration apiproxy.  You can use the Admin UI to do so. 
+You do not need to build the source code in order to use the policy in Apigee Edge.
+All you need is the built JAR, and the appropriate configuration for the policy.
+If you want to build it, feel free.  The instructions are at the bottom of this readme.
 
-5. Now deploy the API Proxy bundle with, Eg,    
-   ```./pushapi -v -d -o ORGNAME -e prod -n csv-shredder bundle```
 
-6. Use a client to load a CSV into the cache, via the proxy. Eg,   
-   ```curl -i -X POST    
-       -H content-type:text/csv   
-       http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sample   
+1. create a cache in the Apigee Edge environment called 'csv-cache'.  This is used by the
+demonstration apiproxy.  You can use the Admin UI to do so.
+
+2. Now deploy the API Proxy bundle with your favorite tool, for example [importAndDeploy.js](https://github.com/DinoChiesa/apigee-edge-js/blob/master/examples/importAndDeploy.js)
+   ```node importAndDeploy.js -v -o $ORG -e $ENV -d bundle```
+
+3. Use a client to load a CSV into the cache, via the proxy. Eg,
+   ```curl -i -X POST
+       -H content-type:text/csv
+       https://$ORG-$ENV.apigee.net/csv-shredder/shred?name=sample
        --data-binary @sample.csv```
 
-7. Use a client to query from the cache, via the proxy. Eg,   
-   ```curl -i -X GET   
-       http://ORGNAME-prod.apigee.net/csv-shredder/shred/sample/PRIMARY_KEY```
+4. Use a client to query from the cache, via the proxy. Eg,
+   ```curl -i -X GET
+       https://$ORG-$ENV.apigee.net/csv-shredder/shred/sample/PRIMARY_KEY```
 
 
 
 ## Dependencies
 
-- Apigee Edge expressions v1.0
-- Apigee Edge message-flow v1.0
-- Apache commons lang 2.6
-- Apache commons csv 1.2
-- FasterXML Jackson 2.5.0
-
-These jars must be available on the classpath for the compile to
-succeed. Using maven to build via the pom.xml file will download all of these files for
-you, automatically. 
-
-### If for some reason you want to download these dependencies manually: 
-
-The first 2 jars are available in Apigee Edge. The first two are
-produced by Apigee; contact Apigee support to obtain these jars to allow
-the compile, or get them here: 
-https://github.com/apigee/api-platform-samples/tree/master/doc-samples/java-cookbook/lib
-
-The Apache commons lang jar is implicitly available in Apigee Edge at runtime, therefore in the pom.xml, the jar is marked with "compile" scope. You can download it from maven.org. The commons csv is not implicitly available in Edge; in the pom file, it is not marked as "compile" scope. 
-
-The Jackson jar is similarly available from the public maven.org repo. Jackson is not marked with compile scope in the pom.xml. 
-
+Maven will resolve all the dependencies during the build / compile phase. 
+The jars that are dependencies must be available  as resources for the proxy at runtime.
+The maven pom file should copy those files to the right place, automatically.
 
 ## Notes
 
-The shredder produces a Java object of type Map<String,Map<String,String>>
-and caches it. It uses the queryparam "name" to store the cached item.
-For this demonstration, you can have as many different cached maps as you like, each accessible by name. 
+1. The shredder produces a Java object of type Map<String,Map<String,String>>
+   and caches it. It uses the queryparam "name" to store the cached item.
+   For this demonstration, you can have as many different cached maps as you like, each accessible by name.
 
-The first row of the CSV is expected to be the header row, which defines the names of the fields in each row. 
+2. The first row of the CSV is expected to be the header row, which defines the names of the fields in each row.
 
-For all subsequent rows, the first field in each row of the CSV is
-treated as the primary key, in other words, the key for the map.  The remaining fields
-are a map of "field name" => "value", where the field names are those
-that are defined in the first row.  
+3. For all subsequent rows, the first field in each row of the CSV is
+   treated as the primary key, in other words, the key for the map.  The remaining fields
+   are a map of "field name" => "value", where the field names are those
+   that are defined in the first row.
 
 
-### Simple Example 
+## Simple Example
 
 For example, the super-simple.csv file has these contents:
 
@@ -97,30 +78,30 @@ To shred that csv, use this command:
 ```
   curl -i -X POST \
     -H content-type:text/csv \
-    http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=simple \
+    https://$ORG-$ENV.apigee.net/csv-shredder/shred?name=simple \
      --data-binary @csv/super-simple.csv
 ```
 
-Notice that the file is specified to curl with --data-binary. If you use -d or --data-ascii, curl will eliminate newlines, which will cause the CSV to be mangled before it is sent to the API Proxy. 
+Notice that the file is specified to curl with --data-binary. If you use -d or --data-ascii, curl will eliminate newlines, which will cause the CSV to be mangled before it is sent to the API Proxy.
 
 
-The cache will then hold a Map with 3 key/value pairs. it will look like this: 
+The cache will then hold a Map with 3 key/value pairs. it will look like this:
 
 ```
-  { 
+  {
      A => { field1 => B, field2 => C, PK => A },
      D => { field1 => E, field2 => F, PK => D },
      G => { field1 => H, field2 => I, PK => G }
   }
 ```
 
-To query the map, you must specify the map name, and the "primary key", both of which are passed as url path elements. 
+To query the map, you must specify the map name, and the "primary key", both of which are passed as url path elements.
 
-For example, 
+For example,
 
-```curl -i http://ORGNAME-prod.apigee.net/csv-shredder/field/simple/A```
+```curl -i https://$ORG-$ENV.apigee.net/csv-shredder/field/simple/A```
 
-result: 
+result:
 ```
 {
   "status": "ok",
@@ -132,24 +113,24 @@ result:
 }
 ```
 
-### Another example: 
+## Another example
 
-To shred a CSV and load it into a Java Map, which then gets inserted into cache: 
+To shred a CSV and load it into a Java Map, which then gets inserted into cache:
 
-shred: 
+shred:
 ```
   curl -i -X POST \
     -H content-type:text/csv \
-    http://ORGNAME-prod.apigee.net/csv-shredder/shred?name=sacramento \
+    https://$ORG-$ENV.apigee.net/csv-shredder/shred?name=sacramento \
      --data-binary @csv/Sacramento-RealEstate-Transactions.csv
 ```
 
-(I got this sample CSV data for Sacramento real estate transactions from SpatialKey: 
+(I got this sample CSV data for Sacramento real estate transactions from SpatialKey:
   https://support.spatialkey.com/spatialkey-sample-csv-data/)
 
-query: 
+query:
 
-```curl -i "http://ORGNAME-prod.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"```
+```curl -i "https://$ORG-$ENV.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"```
 
 result:
 
@@ -173,10 +154,24 @@ result:
 }
 ```
 
+
+## Building
+
+1. unpack (if you can read this, you've already done that).
+
+2. configure the build on your machine by loading the Apigee jars into your local cache.
+  ```bash ./buildsetup.sh```
+
+3. Build with maven.
+  ```mvn clean package```
+
+  The above will copy the generated JAR and its dependencies to the bundle directory.
+
+
 ## LICENSE
 
-This material is copyright 2016 Apigee Corp. 
-This is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file. 
+This material is copyright 2016 Apigee Corp, 2019 Google LLC.
+This is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file.
 
 
 ## Bugs

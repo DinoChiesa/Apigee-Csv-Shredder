@@ -33,6 +33,7 @@ import com.apigee.flow.message.Message;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CsvShredder implements Execution {
+    private final static String varprefix= "csv_";
 
     private final ObjectMapper om = new ObjectMapper();
 
@@ -41,6 +42,8 @@ public class CsvShredder implements Execution {
     public CsvShredder(Map properties) {
         this.properties = properties;
     }
+
+    private static String varName(String s) { return varprefix + s;}
 
     private List<String> getFieldList(MessageContext msgCtxt) throws IllegalStateException {
         String fieldlist = (String) this.properties.get("fieldlist");
@@ -81,8 +84,6 @@ public class CsvShredder implements Execution {
     public ExecutionResult execute (final MessageContext msgCtxt,
                                     final ExecutionContext execContext) {
         Message msg = msgCtxt.getMessage();
-        String varprefix= "csv_";
-        String varName = null;
         try {
             List<String> list = getFieldList(msgCtxt);
 
@@ -120,10 +121,8 @@ public class CsvShredder implements Execution {
         }
         catch (java.lang.Exception exc1) {
             //exc1.printStackTrace(); // will go to stdout of message processor
-            varName = varprefix + "error";
-            msgCtxt.setVariable(varName, exc1.getMessage());
-            varName = varprefix + "stacktrace";
-            msgCtxt.setVariable(varName, ExceptionUtils.getStackTrace(exc1));
+            msgCtxt.setVariable(varName("error"), exc1.getMessage());
+            msgCtxt.setVariable(varName("stacktrace"), ExceptionUtils.getStackTrace(exc1));
             return ExecutionResult.ABORT;
         }
 

@@ -1,8 +1,5 @@
 // MapExtractor.java
 //
-// This is the source code for a Java callout for Apigee Edge.
-// This callout is very simple - it sleeps, and then returns SUCCESS.
-//
 // ------------------------------------------------------------------
 
 package com.dinochiesa.edgecallouts;
@@ -73,9 +70,11 @@ public class MapExtractor implements Execution {
             fieldname = java.net.URLDecoder.decode(fieldname, "UTF-8");
 
             varName = getMapVariable(msgCtxt);
+            @SuppressWarnings("unchecked")
             Map<String,Object> map = (Map<String,Object>) msgCtxt.getVariable(varName);
 
             if (map.containsKey(fieldname)) {
+                @SuppressWarnings("unchecked")
                 Map<String,String> map1 = (Map<String,String>) map.get(fieldname);
 
                 String jsonResult = om.writer()

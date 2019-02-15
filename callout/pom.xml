@@ -5,25 +5,21 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
   <artifactId>edge-csv-parse-callout</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.1</version>
   <name>EdgeCalloutCsv</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
+    <jackson.version>2.9.8</jackson.version>
+    <commons-codec.version>1.12</commons-codec.version>
+    <commons-csv.version>1.6</commons-csv.version>
     <apiproxy.java.rsrc.dir>../bundle/apiproxy/resources/java</apiproxy.java.rsrc.dir>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-      <version>4.3.5</version>
-      <scope>compile</scope>
-    </dependency>
-
     <dependency>
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
@@ -34,20 +30,20 @@
     <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.7</version>
+      <version>${commons-codec.version}</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.5.0</version>
+        <version>${jackson.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-csv</artifactId>
-      <version>1.2</version>
+      <version>${commons-csv.version}</version>
     </dependency>
 
 
@@ -82,16 +78,18 @@ do it manually by running these commands:
       <groupId>com.apigee.edge</groupId>
       <artifactId>message-flow</artifactId>
       <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.apigee.edge</groupId>
       <artifactId>expressions</artifactId>
       <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
-    <finalName>${project.artifactId}</finalName>
+    <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -116,26 +114,18 @@ do it manually by running these commands:
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.8.0</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
+          <compilerArgument>-Xlint:unchecked</compilerArgument>
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-
+        <version>3.1.1</version>
         <configuration>
           <archive>
             <!-- do not include the pom.xml file in the generated jar -->
@@ -157,14 +147,10 @@ do it manually by running these commands:
                     <include name="${project.artifactId}.jar"/>
                     <!-- copy any required dependencies tht are not
                     already included in the Edge runtime: -->
-
-                    <include name="lib/commons-csv-1.2.jar"/>
-                    <include name="lib/jackson-databind-2.5.0.jar"/>
-                    <include name="lib/jackson-core-2.5.0.jar"/>
-                    <include name="lib/jackson-annotations-2.5.0.jar"/>
-
+                    <include name="lib/*.jar"/>
+                    <exclude name="lib/message-flow-1.0.0.jar"/>
+                    <exclude name="lib/expressions-1.0.0.jar"/>
                     <!--                    -->
-
                   </fileset>
                   <mapper type="flatten"/>
                 </copy>
@@ -172,6 +158,42 @@ do it manually by running these commands:
             </configuration>
             <goals>
               <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+     <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M2</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.0.5</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+        <version>2.7</version>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>display-dependency-updates</goal>
+              <goal>display-plugin-updates</goal>
             </goals>
           </execution>
         </executions>
