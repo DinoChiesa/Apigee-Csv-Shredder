@@ -1,17 +1,23 @@
 # Csv Shredder Java Callout
 
 This directory contains the Java source code and pom.xml file required to
-compile a pair of Java callouts for Apigee.
-The first callout shreds a CSV, returns a Java map object, and returns success.
-The second callout retrieves items from a Java Map object, by key.
+compile a set of Java callouts for Apigee, that involve parsing CSVs, and handling the output of that data.
 
-These callouts can work together, demonstrating:
+| callout        | description                                                                                         |
+| -------------- | --------------------------------------------------------------------------------------------------- |
+| `CsvShredder`  | parses a CSV, creates a Java map object from that data, and stores the map into a context variable. It also stores a JSON version of that data into a different context variable. |
+| `MapExtractor` | retrieves items from a Java Map object, by key.                                                     |
 
-1. how to parse a CSV within Apigee
 
-2. how to store a Java object in the Apigee cache
+These callouts can work together or independently.
 
-3. How to retrieve a Java object from Cache, and then parse the object on subsequent API calls
+For example, you could use `CsvShredder` to parse a CSV within Apigee, then use
+`PopulateCache` to store the resulting Java Map object in the Apigee cache.  Then `LookupCache`
+to retrieve a Java object from Cache, and then `MapExtractor` to query the
+cached object on subsequent API calls.
+
+
+As another example, you could use `CsvShredder` to parse a CSV within Apigee, then just emit the resulting JSON to the response.
 
 
 ## Disclaimer
@@ -21,11 +27,10 @@ This example is not an official Google product, nor is it part of an official Go
 
 ## Two classes
 
-* *com.dinochiesa.edgecallouts.CsvShredder* - reads the ambient request or response message,
+* *com.google.apigee.callouts.CsvShredder* - reads the ambient request or response message,
   parse the CSV, serialize as a Java map, and also as a json object.
 
-
-* *com.dinochiesa.edgecallouts.MapExtractor* - extract a value from a context variable that contains a Java map.
+* *com.google.apigee.callouts.MapExtractor* - extract a value from a context variable that contains a Java map.
 
 See the example bundle for configuration.
 
@@ -43,23 +48,26 @@ demonstration apiproxy.  You can use the Admin UI to do so.
 
 2. Now deploy the API Proxy bundle with your favorite tool, for example [importAndDeploy.js](https://github.com/DinoChiesa/apigee-edge-js-examples/blob/main/importAndDeploy.js)
    ```
+   # for Apigee Edge SaaS or Apigee X
    node importAndDeploy.js -v -o $ORG -e $ENV -d bundle
    ```
 
 3. Use a client to load a CSV into the cache, via the proxy. Eg,
    ```
-   curl -i -X POST
-       -H content-type:text/csv
-       https://$ORG-$ENV.apigee.net/csv-shredder/shred?name=sample
+   # for Apigee X
+   endpoint=https://whatever-your-endpoint-is
+
+   curl -i -X POST \
+       -H content-type:text/csv \
+       $endpoint/csv-shredder/shred?name=sample \
        --data-binary @sample.csv
    ```
 
 4. Use a client to query from the cache, via the proxy. Eg,
    ```
-   curl -i -X GET
-       https://$ORG-$ENV.apigee.net/csv-shredder/shred/sample/PRIMARY_KEY
+   curl -i -X GET \
+       $endpoint/csv-shredder/shred/sample/PRIMARY_KEY
    ```
-
 
 
 ## Dependencies
@@ -82,7 +90,7 @@ The maven pom file should copy those files to the right place, automatically.
    that are defined in the first row.
 
 
-## Simple Example
+## Example 1: Simple CSV
 
 For example, the `super-simple.csv` file has these contents:
 
@@ -98,7 +106,7 @@ To shred that csv, use this command:
 ```
   curl -i -X POST \
     -H content-type:text/csv \
-    https://$ORG-$ENV.apigee.net/csv-shredder/shred?name=simple \
+    $endpoint/csv-shredder/shred?name=simple \
      --data-binary @csv/super-simple.csv
 ```
 
@@ -137,20 +145,21 @@ result:
 }
 ```
 
-## Another example
+## Example 2: Sacramento Real Estate Transactions
 
-To shred a CSV and load it into a Java Map, which then gets inserted into cache:
+I got this sample CSV data for Sacramento real estate transactions from SpatialKey:
+  https://support.spatialkey.com/spatialkey-sample-csv-data/
+
+To shred this more complicated CSV and load it into a Java Map, which then gets inserted into cache:
 
 shred:
 ```
   curl -i -X POST \
     -H content-type:text/csv \
-    https://$ORG-$ENV.apigee.net/csv-shredder/shred?name=sacramento \
+    $endpoint/csv-shredder/shred?name=sacramento \
      --data-binary @csv/Sacramento-RealEstate-Transactions.csv
 ```
 
-(I got this sample CSV data for Sacramento real estate transactions from SpatialKey:
-  https://support.spatialkey.com/spatialkey-sample-csv-data/)
 
 query:
 
@@ -181,6 +190,19 @@ result:
 ```
 
 
+## Example 3: Converting CSV to JSON
+
+This example just sends in a CSV, and gets back an equivalent JSON in response.
+
+```
+  curl -i -X POST \
+    -H content-type:text/csv \
+    $endpoint/csv-shredder/tojson \
+     --data-binary @csv/Sacramento-RealEstate-Transactions.csv
+```
+
+
+
 ## Building
 
 1. unpack (if you can read this, you've already done that).
@@ -200,7 +222,7 @@ result:
 
 ## LICENSE
 
-This material is copyright 2016 Apigee Corp, 2019 Google LLC.
+This material is Copyright 2016 Apigee Corp, 2019-2021 Google LLC.
 This is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file.
 
 

@@ -1,5 +1,7 @@
 <LookupCache name='Cache-RetrieveMap'>
+<!--
   <CacheResource>csv-cache</CacheResource>
+-->
   <AssignTo>csv_map</AssignTo>
   <Scope>Application</Scope>
   <CacheKey>

@@ -1,5 +1,7 @@
 <PopulateCache name='Cache-StoreMap'>
+<!--
   <CacheResource>csv-cache</CacheResource>
+-->
   <Source>csv_result_java</Source>
   <Scope>Application</Scope>
   <CacheKey>
@@ -17,7 +19,7 @@
 
     -->
 
-    <TimeoutInSec ref='duration_variable'>864000</TimeoutInSec>  <!-- 864000 = 10 days -->
+    <TimeoutInSec ref='duration_variable'>300</TimeoutInSec>
 
   </ExpirySettings>
 </PopulateCache>

@@ -7,54 +7,94 @@
   </HTTPProxyConnection>
 
   <FaultRules/>
+  <DefaultFaultRule name="fault-rule">
+    <Step>
+      <Name>AM-InjectProxyVersionHeader</Name>
+    </Step>
+  </DefaultFaultRule>
 
   <PreFlow name="PreFlow">
     <Request/>
     <Response>
-      <Step><Name>AM-ClearResponse</Name></Step>
+      <Step>
+        <Name>AM-ClearResponse</Name>
+      </Step>
+      <Step>
+        <Name>AM-InjectProxyVersionHeader</Name>
+      </Step>
     </Response>
   </PreFlow>
 
   <PostFlow name="PostFlow">
     <Request/>
     <Response>
-      <Step><Name>JS-EmitElapsed</Name></Step>
+      <Step>
+        <Name>JS-EmitElapsed</Name>
+      </Step>
     </Response>
   </PostFlow>
 
   <Flows>
     <Flow name='shred'>
-      <Description>shred a CSV</Description>
+      <Description>parse a CSV</Description>
       <Request>
         <Step>
           <Name>RF-InvalidRequest</Name>
-          <Condition>request.queryparam.name = null</Condition>
+          <Condition>request.queryparam.fieldlist = null OR request.queryparam.name = null</Condition>
         </Step>
-        <Step><Name>Java-ShredCsv</Name></Step>
-        <Step><Name>Cache-StoreMap</Name></Step>
+        <Step>
+          <Name>Java-ShredCsv</Name>
+        </Step>
+        <Step>
+          <Name>Cache-StoreMap</Name>
+        </Step>
       </Request>
       <Response>
-        <Step><Name>AM-StoreResponse</Name></Step>
+        <Step>
+          <Name>AM-StoreResponse</Name>
+        </Step>
       </Response>
       <Condition>(proxy.pathsuffix ~ "/shred") and (request.verb = "POST")</Condition>
     </Flow>
 
-
     <Flow name='query'>
       <Description>retrieve a datafield from the cached object</Description>
       <Request>
-        <Step><Name>Extract-Fields-from-Path</Name></Step>
+        <Step>
+          <Name>Extract-Fields-from-Path</Name>
+        </Step>
         <Step>
           <Name>RF-InvalidRequest</Name>
           <Condition>extracted.mapname = null</Condition>
         </Step>
-        <Step><Name>Cache-RetrieveMap</Name></Step>
-        <Step><Name>Java-GetFromMap</Name></Step>
+        <Step>
+          <Name>Cache-RetrieveMap</Name>
+        </Step>
+        <Step>
+          <Name>Java-GetFromMap</Name>
+        </Step>
       </Request>
       <Response>
-        <Step><Name>AM-QueryResponse</Name></Step>
+        <Step>
+          <Name>AM-QueryResponse</Name>
+        </Step>
       </Response>
       <Condition>(proxy.pathsuffix ~~ "/field/[^\/]+/[^\/]+") and (request.verb = "GET")</Condition>
+    </Flow>
+
+    <Flow name='tojson'>
+      <Description>parse a CSV and return a JSON form</Description>
+      <Request>
+        <Step>
+          <Name>Java-ShredCsv</Name>
+        </Step>
+      </Request>
+      <Response>
+        <Step>
+          <Name>AM-JsonResponse</Name>
+        </Step>
+      </Response>
+      <Condition>(proxy.pathsuffix ~ "/tojson") and (request.verb = "POST")</Condition>
     </Flow>
 
     <Flow name='unknown'>
@@ -64,7 +104,9 @@
       -->
       <Description>Unknown request</Description>
       <Request>
-        <Step><Name>RF-UnknownRequest</Name></Step>
+        <Step>
+          <Name>RF-UnknownRequest</Name>
+        </Step>
       </Request>
       <Response/>
     </Flow>

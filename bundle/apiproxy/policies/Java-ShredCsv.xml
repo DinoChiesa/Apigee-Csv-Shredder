@@ -4,6 +4,6 @@
     <!-- Should be synchronized with the fields in the CSV passed as POST data -->
     <Property name="fieldlist">{request.queryparam.fieldlist}</Property>
   </Properties>
-  <ClassName>com.dinochiesa.edgecallouts.CsvShredder</ClassName>
-  <ResourceURL>java://edge-csv-parse-callout-1.0.1.jar</ResourceURL>
+  <ClassName>com.google.apigee.callouts.CsvShredder</ClassName>
+  <ResourceURL>java://apigee-csv-parse-20210505.jar</ResourceURL>
 </JavaCallout>
