@@ -49,12 +49,10 @@ public class CsvShredder implements Execution {
         String fieldlist = (String) this.properties.get("fieldlist");
         if (fieldlist == null || fieldlist.equals("")) {
             return null; // assume the first row gives the field list
-            //throw new IllegalStateException("fieldlist is null or empty.");
         }
         fieldlist = resolvePropertyValue(fieldlist, msgCtxt);
         if (fieldlist == null || fieldlist.equals("")) {
             return null; // assume the first row gives the field list
-            //throw new IllegalStateException("fieldlist resolves to null or empty.");
         }
 
         // now split by commas
