@@ -130,7 +130,7 @@ To query the map, you must specify the map name, and the value of the "primary k
 For example,
 
 ```
-curl -i https://$ORG-$ENV.apigee.net/csv-shredder/field/simple/A
+curl -i $endpoint/csv-shredder/field/simple/A
 ```
 
 result:
@@ -150,9 +150,21 @@ result:
 I got this sample CSV data for Sacramento real estate transactions from SpatialKey:
   https://support.spatialkey.com/spatialkey-sample-csv-data/
 
-To shred this more complicated CSV and load it into a Java Map, which then gets inserted into cache:
+This CSV looks like this:
+```
+street,city,zip,state,beds,baths,sqft,type,sale_date,price,latitude,longitude
+3526 HIGH ST,SACRAMENTO,95838,CA,2,1,836,Residential,Wed May 21 00:00:00 EDT 2008,59222,38.631913,-121.434879
+51 OMAHA CT,SACRAMENTO,95823,CA,3,1,1167,Residential,Wed May 21 00:00:00 EDT 2008,68212,38.478902,-121.431028
+2796 BRANCH ST,SACRAMENTO,95815,CA,2,1,796,Residential,Wed May 21 00:00:00 EDT 2008,68880,38.618305,-121.443839
+2805 JANETTE WAY,SACRAMENTO,95815,CA,2,1,852,Residential,Wed May 21 00:00:00 EDT 2008,69307,38.616835,-121.439146
+6001 MCMAHON DR,SACRAMENTO,95824,CA,2,1,797,Residential,Wed May 21 00:00:00 EDT 2008,81900,38.51947,-121.435768
+...
+```
 
-shred:
+You can see it has a header row, and then a series of lines, each with fields corresponding to the header row.
+
+To shred this more complicated CSV and load it into a Java Map, which then gets inserted into cache, use this:
+
 ```
   curl -i -X POST \
     -H content-type:text/csv \
@@ -161,13 +173,13 @@ shred:
 ```
 
 
-query:
+Then, to query the map:
 
 ```
-curl -i "https://$ORG-$ENV.apigee.net/csv-shredder/field/sacramento/51%20OMAHA%20CT"
+curl -i "$endpoint/csv-shredder/field/sacramento/51%20OMAHA%20CT"
 ```
 
-result:
+the result:
 
 ```
 {
@@ -201,6 +213,65 @@ This example just sends in a CSV, and gets back an equivalent JSON in response.
      --data-binary @csv/Sacramento-RealEstate-Transactions.csv
 ```
 
+
+result:
+```
+HTTP/1.1 200 OK
+Date: Wed, 05 May 2021 17:35:36 GMT
+Content-Type: application/json
+Content-Length: 347604
+Connection: keep-alive
+apiproxy: csv-shredder r3
+X-time-target-elapsed: 0.0
+X-time-total-elapsed: 324.0
+
+{
+  "2109 HAMLET PL" : {
+    "zip" : "95608",
+    "baths" : "2",
+    "city" : "CARMICHAEL",
+    "sale_date" : "Tue May 20 00:00:00 EDT 2008",
+    "street" : "2109 HAMLET PL",
+    "price" : "484000",
+    "latitude" : "38.602754",
+    "sqft" : "1598",
+    "state" : "CA",
+    "beds" : "2",
+    "type" : "Residential",
+    "longitude" : "-121.329326"
+  },
+  "2100 BEATTY WAY" : {
+    "zip" : "95747",
+    "baths" : "2",
+    "city" : "ROSEVILLE",
+    "sale_date" : "Thu May 15 00:00:00 EDT 2008",
+    "street" : "2100 BEATTY WAY",
+    "price" : "208250",
+    "latitude" : "38.737882",
+    "sqft" : "1371",
+    "state" : "CA",
+    "beds" : "3",
+    "type" : "Residential",
+    "longitude" : "-121.308142"
+  },
+  "2103 BURBERRY WAY" : {
+    "zip" : "95835",
+    "baths" : "2",
+    "city" : "SACRAMENTO",
+    "sale_date" : "Mon May 19 00:00:00 EDT 2008",
+    "street" : "2103 BURBERRY WAY",
+    "price" : "362305",
+    "latitude" : "38.67342",
+    "sqft" : "1800",
+    "state" : "CA",
+    "beds" : "3",
+    "type" : "Residential",
+    "longitude" : "-121.508542"
+  },
+  ...
+```
+
+Notice: the order of the items in the JSON is not necessarily the same as the order of the items in the original CSV !
 
 
 ## Building
