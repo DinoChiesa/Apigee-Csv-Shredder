@@ -40,7 +40,8 @@
       <Request>
         <Step>
           <Name>RF-InvalidRequest</Name>
-          <Condition>request.queryparam.fieldlist = null OR request.queryparam.name = null</Condition>
+          <!-- request.queryparam.fieldlist is optional -->
+          <Condition>request.queryparam.name = null</Condition>
         </Step>
         <Step>
           <Name>Java-ShredCsv</Name>
@@ -85,6 +86,7 @@
     <Flow name='tojson'>
       <Description>parse a CSV and return a JSON form</Description>
       <Request>
+        <!-- request.queryparam.fieldlist is optional -->
         <Step>
           <Name>Java-ShredCsv</Name>
         </Step>
