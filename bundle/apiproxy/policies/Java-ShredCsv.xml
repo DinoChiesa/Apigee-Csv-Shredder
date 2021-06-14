@@ -5,5 +5,5 @@
     <Property name="fieldlist">{request.queryparam.fieldlist}</Property>
   </Properties>
   <ClassName>com.google.apigee.callouts.CsvShredder</ClassName>
-  <ResourceURL>java://apigee-csv-parse-20210505.jar</ResourceURL>
+  <ResourceURL>java://apigee-csv-parse-20210614.jar</ResourceURL>
 </JavaCallout>

@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
   <artifactId>apigee-csv-parse</artifactId>
-  <version>20210505</version>
+  <version>20210614</version>
   <name>ApigeeJavaCsv</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
@@ -13,24 +13,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
-    <jackson.version>[2.9.10.3,)</jackson.version>
-<!--
-    <commons-codec.version>1.12</commons-codec.version>
--->
+    <jackson.version>[2.9.10.7,)</jackson.version>
     <commons-csv.version>1.6</commons-csv.version>
     <apiproxy.java.rsrc.dir>../bundle/apiproxy/resources/java</apiproxy.java.rsrc.dir>
   </properties>
 
   <dependencies>
-<!--
-    <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-      <version>${commons-codec.version}</version>
-      <scope>compile</scope>
-    </dependency>
--->
-
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
