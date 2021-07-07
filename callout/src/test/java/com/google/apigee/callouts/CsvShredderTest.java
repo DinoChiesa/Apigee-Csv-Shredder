@@ -1,7 +1,7 @@
 // CsvShredderTest.java
 // ------------------------------------------------------------------
 //
-// Last saved: <2021-July-07 15:37:24>
+// Last saved: <2021-July-07 16:36:19>
 // ------------------------------------------------------------------
 //
 
@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import mockit.Mock;
@@ -116,8 +117,12 @@ public class CsvShredderTest {
     CsvShredder callout = new CsvShredder(properties);
     ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
     Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+
+    Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "1000");
+
     Map<String, Map<String, String>> result =
         (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
+
     Assert.assertEquals(result.size(), 1000);
     Assert.assertNotNull(result.get("000165"));
     Assert.assertEquals(result.get("000165").get("RAND"), "24974");
@@ -125,5 +130,65 @@ public class CsvShredderTest {
     Assert.assertEquals(result.get("000672").get("RAND"), "42656");
     Assert.assertNotNull(result.get("000988"));
     Assert.assertEquals(result.get("000988").get("RAND"), "25784");
+  }
+
+  @Test
+  public void rulesReadList() throws Exception {
+    messageContent = readAllText("sample37.csv");
+    Properties properties = new Properties();
+    properties.put("output-format", "list");
+    CsvShredder callout = new CsvShredder(properties);
+    ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
+    Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+    Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "37");
+    List<Map<String, String>> result =
+        (List<Map<String, String>>) msgCtxt.getVariable("csv_result_java");
+    Assert.assertEquals(result.size(), 37);
+    Map<String, String> item = result.get(13);
+    Assert.assertNotNull(item);
+    Assert.assertEquals(item.get("#Method"), "POST");
+    Assert.assertEquals(
+        item.get("URI Resource Path"), "/DBTLN/v2/accounts/{AcctNbr}/notes/{NoteNbr}/collateral");
+  }
+
+  @Test
+  public void rulesReadMap() throws Exception {
+    messageContent = readAllText("sample37.csv");
+    Properties properties = new Properties();
+    properties.put("output-format", "map");
+    CsvShredder callout = new CsvShredder(properties);
+    ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
+    Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+    Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "4");
+    Map<String, Map<String, String>> result =
+        (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
+    Assert.assertEquals(result.size(), 4);
+    Map<String, String> item = result.get("PUT");
+    Assert.assertNotNull(item);
+    Assert.assertEquals(item.get("#Method"), "PUT");
+    // last entry "wins" when the output is a map
+    Assert.assertEquals(
+        item.get("URI Resource Path"), "/DBTCI/v2/customers/{CustNbr}/phone-numbers/{ResnCde}");
+  }
+
+  @Test
+  public void rulesReadMapWithContrivedPk() throws Exception {
+    messageContent = readAllText("sample37.csv");
+    Properties properties = new Properties();
+    properties.put("output-format", "map");
+    properties.put("contrive-primary-key", "true");
+    CsvShredder callout = new CsvShredder(properties);
+    ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
+    Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+    Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "37");
+    Map<String, Map<String, String>> result =
+        (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
+    Assert.assertEquals(result.size(), 37);
+    Map<String, String> item = result.get("0000000025");
+    Assert.assertNotNull(item);
+    Assert.assertEquals(item.get("#Method"), "DELETE");
+    Assert.assertEquals(
+        item.get("URI Resource Path"),
+        "/DBTFM/v2/scheduled-transfers/{SysCde}/{SndAcctNbr}/{SeqNbr}");
   }
 }

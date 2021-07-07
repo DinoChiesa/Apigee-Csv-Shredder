@@ -36,12 +36,16 @@ In each case, you can configure the callout with a set of properties.
 
 ### CsvShredder configuration
 
-The `CsvShredder` accepts two optional properties.
+The `CsvShredder` accepts some optional properties that affect its behavior.
 
 | property | description |
 | -------- | ------------ |
-| fieldlist | a comma-separated list of names to apply to the fields in the CSV. The default behavior is to use the first row in the CSV as a header. |
-| trim-spaces | a string, if "true", then the callout trims leading and trailing spaces from the values in the CSV |
+| `fieldlist` | a comma-separated list of names to apply to the fields in the CSV. The default behavior is to use the first row in the CSV as a header. |
+| `trim-spaces` | a string, if "true", then the callout trims leading and trailing spaces from the values in the CSV |
+| `output-format` | either `map`, or `list`. Defaults to `map`. If the value in the first column is not unique, consider parsing to a list.  |
+| `contrive-primary-key` | `true` or `false`. Setting this to `true` may be helpful when parsing to a map, and the first element is not unique. In this case, the callout will contrive a unique primary key for each element. |
+
+
 
 Example:
 ```xml

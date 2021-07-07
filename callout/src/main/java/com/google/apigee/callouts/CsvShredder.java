@@ -47,6 +47,35 @@ public class CsvShredder extends CalloutBase implements Execution {
     return _getBooleanProperty(msgCtxt, "trim-spaces", false);
   }
 
+  private Boolean getContrivePrimaryKey(MessageContext msgCtxt) throws Exception {
+    return _getBooleanProperty(msgCtxt, "contrive-primary-key", false);
+  }
+
+  static enum OutputFormat {
+    MAP,
+    LIST,
+    NOTSPECIFIED
+  }
+
+  private OutputFormat getOutputFormat(MessageContext msgCtxt) throws Exception {
+    String value = (String) this.properties.get("output-format");
+    if (value == null || value.equals("")) {
+      return OutputFormat.MAP;
+    }
+    value = resolveVariableReferences(value, msgCtxt);
+    if (value == null || value.equals("")) {
+      return OutputFormat.MAP;
+    }
+
+    if (value.equalsIgnoreCase("list")) {
+      return OutputFormat.LIST;
+    }
+    if (value.equalsIgnoreCase("map")) {
+      return OutputFormat.MAP;
+    }
+    throw new IllegalArgumentException("output-format");
+  }
+
   private List<String> getFieldList(MessageContext msgCtxt) throws IllegalStateException {
     String fieldlist = (String) this.properties.get("fieldlist");
     if (fieldlist == null || fieldlist.equals("")) {
@@ -66,9 +95,22 @@ public class CsvShredder extends CalloutBase implements Execution {
     return list;
   }
 
+  private static String padLeft(String s, int length, char c) {
+    int L = s.length();
+    if (L >= length) {
+      return s;
+    }
+    StringBuilder sb = new StringBuilder();
+    while (sb.length() < length - L) {
+      sb.append(c);
+    }
+    sb.append(s);
+    return sb.toString();
+  }
+
   public ExecutionResult execute0(final MessageContext msgCtxt) throws Exception {
     Message msg = msgCtxt.getMessage();
-    List<String> list = getFieldList(msgCtxt);
+    List<String> fieldList = getFieldList(msgCtxt);
 
     // 1. we want to read the content as a stream
     InputStreamReader in = new InputStreamReader(msg.getContentAsStream());
@@ -83,25 +125,53 @@ public class CsvShredder extends CalloutBase implements Execution {
     if (getTrimSpaces(msgCtxt)) {
       format = format.withIgnoreSurroundingSpaces(true);
     }
-    if (list == null) {
+    if (fieldList == null) {
       records = format.withHeader().parse(in);
     } else {
-      records = format.withHeader(list.toArray(new String[1])).parse(in);
+      records = format.withHeader(fieldList.toArray(new String[1])).parse(in);
     }
 
-    // 3. process each record in the CSV, convert to an element in a map
-    for (CSVRecord record : records) {
-      // assume first field is the primary key
-      String firstField = record.get(0);
-      map.put(firstField, record.toMap()); // Map<String,String>
+    OutputFormat desiredOutputFormat = getOutputFormat(msgCtxt);
+    if (desiredOutputFormat == OutputFormat.LIST) {
+      // 3. convert the Iterable to a List
+      List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+      for (CSVRecord record : records) {
+        list.add(record.toMap()); // Map<String,String>
+      }
+
+      msgCtxt.setVariable(varName("result_format"), "list");
+
+      // 4a. set a variable to hold the generated List<Map>
+      msgCtxt.setVariable(varName("result_java"), list);
+
+      // 4b. set a variable to hold the number of rows read
+      msgCtxt.setVariable(varName("rows_read"), String.format("%d", list.size()));
+      // 5. for diagnostic purposes, serialize to JSON as well
+      String jsonResult = om.writer().withDefaultPrettyPrinter().writeValueAsString(list);
+      msgCtxt.setVariable(varName("result_json"), jsonResult);
+    } else if (desiredOutputFormat == OutputFormat.MAP) {
+      // 3. process each record in the CSV, convert to an element in a map
+      Boolean contrivePk = getContrivePrimaryKey(msgCtxt);
+      int c = 0;
+      for (CSVRecord record : records) {
+        String primaryKey =
+            contrivePk
+                ? padLeft(String.format("%d", c), 10, '0')
+                : record.get(0); // by default, first field is PK
+        map.put(primaryKey, record.toMap()); // Map<String,String>
+        c++;
+      }
+
+      msgCtxt.setVariable(varName("result_format"), "map");
+      // 4a. set a variable to hold the generated Map<String, Map>
+      msgCtxt.setVariable(varName("result_java"), map);
+
+      // 4b. set a variable to hold the number of rows read
+      msgCtxt.setVariable(varName("rows_read"), String.format("%d", map.size()));
+      // 5. for diagnostic purposes, serialize to JSON as well
+      String jsonResult = om.writer().withDefaultPrettyPrinter().writeValueAsString(map);
+      msgCtxt.setVariable(varName("result_json"), jsonResult);
     }
-
-    // 4. set a variable to hold the generated Map<String, Map>
-    msgCtxt.setVariable(varName("result_java"), map);
-
-    // 5. for diagnostic purposes, serialize to JSON as well
-    String jsonResult = om.writer().withDefaultPrettyPrinter().writeValueAsString(map);
-    msgCtxt.setVariable(varName("result_json"), jsonResult);
 
     return ExecutionResult.SUCCESS;
   }
