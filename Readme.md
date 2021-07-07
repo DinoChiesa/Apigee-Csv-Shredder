@@ -52,6 +52,7 @@ Example:
 <JavaCallout name='Java-ShredCsv'>
   <Properties>
     <Property name="trim-spaces">true</Property>
+    <Property name="output-format">list</Property>
   </Properties>
   <ClassName>com.google.apigee.callouts.CsvShredder</ClassName>
   <ResourceURL>java://apigee-csv-parse-20210707.jar</ResourceURL>
@@ -103,16 +104,24 @@ The maven pom file should copy those files to the right place, automatically.
 
 ## Notes
 
-1. The shredder produces a Java object of type `Map<String,Map<String,String>>`
-   and caches it. It uses the queryparam "name" to store the cached item.
-   For this demonstration, you can have as many different cached maps as you like, each accessible by name.
+1. The example proxy uses the CsvShredder callout to produce a Java object of
+   type `Map<String,Map<String,String>>`, and then caches it using the
+   CachePopulate policy. The example proxy uses the queryparam "name" to store
+   the cached item.  For this demonstration, you can have as many different
+   cached maps as you like, each accessible by name.
 
-2. The first row of the CSV is expected to be the header row, which defines the names of the fields in each row.
+2. The first row of the CSV is expected to be the header row, which defines the
+   names of the fields in each row. If you don't do that, then you can specify a fieldlist property. 
 
-3. For all subsequent rows, the first field in each row of the CSV is
-   treated as the primary key, in other words, the key for the map. The remaining fields
-   are a map of "field name" => "value", where the field names are those
-   that are defined in the first row.
+3. When reading into a map, for all data rows, the first field in each row of
+   the CSV is treated as the primary key; in other words, it is treated as the
+   key for the map. The remaining fields are a map of "field name" => "value",
+   where the field names are those that are defined in the first row. If the
+   first field is not unique in your data, then the resulting map will be
+   "missing" some values. To work around this, use either the
+   `contrive-primary-key` property, or set the `output-format` to `list`. Both
+   of these properties are documented above.
+   
 
 
 ## Example 1: Simple CSV
