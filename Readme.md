@@ -333,4 +333,4 @@ This is licensed under the Apache 2.0 license. See the [LICENSE](LICENSE) file.
 
 ## Bugs
 
-There are no unit tests for this project.
+The unit tests for this project are thin.
