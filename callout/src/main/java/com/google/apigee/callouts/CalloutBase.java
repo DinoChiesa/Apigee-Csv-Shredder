@@ -62,29 +62,42 @@ public abstract class CalloutBase implements Execution {
   }
 
   protected boolean getDebug() {
-    String wantDebug = (String) this.properties.get("debug");
-    boolean debug = (wantDebug != null) && Boolean.parseBoolean(wantDebug);
-    return debug;
+    String flag = this.properties.get("debug");
+    return (flag!=null) && flag.equalsIgnoreCase("true");
   }
 
-  // If the value of a property contains a pair of curlies,
-  // eg, {apiproxy.name}, then "resolve" the value by de-referencing
-  // the context variable whose name appears between the curlies.
-  // If the variable name is not known, then it returns a null.
-  protected String resolvePropertyValue(String spec, MessageContext msgCtxt) {
+  protected boolean _getBooleanProperty(MessageContext msgCtxt, String propName, boolean defaultValue)
+      throws Exception {
+    String flag = this.properties.get(propName);
+    if (flag != null) flag = flag.trim();
+    if (flag == null || flag.equals("")) {
+      return defaultValue;
+    }
+    flag = resolveVariableReferences(flag, msgCtxt);
+    if (flag == null || flag.equals("")) {
+      return defaultValue;
+    }
+    return flag.equalsIgnoreCase("true");
+  }
+
+  protected String resolveVariableReferences(String spec, MessageContext msgCtxt) {
     Matcher matcher = variableReferencePattern.matcher(spec);
     StringBuffer sb = new StringBuffer();
     while (matcher.find()) {
       matcher.appendReplacement(sb, "");
       sb.append(matcher.group(1));
-      Object v = msgCtxt.getVariable(matcher.group(2));
+      String ref = matcher.group(2);
+      String[] parts = ref.split(":", 2);
+      Object v = msgCtxt.getVariable(parts[0]);
       if (v != null) {
         sb.append((String) v);
+      } else if (parts.length > 1) {
+        sb.append(parts[1]);
       }
       sb.append(matcher.group(3));
     }
     matcher.appendTail(sb);
-    return (sb.length() > 0) ? sb.toString() : null;
+    return sb.toString();
   }
 
   protected static String getStackTraceAsString(Throwable t) {

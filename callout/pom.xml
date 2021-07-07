@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
   <artifactId>apigee-csv-parse</artifactId>
-  <version>20210614</version>
+  <version>20210707</version>
   <name>ApigeeJavaCsv</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
@@ -13,8 +13,10 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
+    <testng.version>6.8.7</testng.version> <!-- current: 6.9.4 -->
     <jackson.version>[2.9.10.7,)</jackson.version>
-    <commons-csv.version>1.6</commons-csv.version>
+    <jmockit.version>1.7</jmockit.version>
+    <commons-csv.version>1.8</commons-csv.version>
     <apiproxy.java.rsrc.dir>../bundle/apiproxy/resources/java</apiproxy.java.rsrc.dir>
   </properties>
 
@@ -71,6 +73,21 @@ do it manually by running these commands:
       <version>1.0.0</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.googlecode.jmockit</groupId>
+      <artifactId>jmockit</artifactId>
+      <version>${jmockit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

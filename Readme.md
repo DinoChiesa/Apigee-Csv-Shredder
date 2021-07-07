@@ -32,8 +32,29 @@ This example is not an official Google product, nor is it part of an official Go
 
 * *com.google.apigee.callouts.MapExtractor* - extract a value from a context variable that contains a Java map.
 
-See the example bundle for configuration.
+In each case, you can configure the callout with a set of properties.
 
+### CsvShredder configuration
+
+The `CsvShredder` accepts two optional properties.
+
+| property | description |
+| -------- | ------------ |
+| fieldlist | a comma-separated list of names to apply to the fields in the CSV. The default behavior is to use the first row in the CSV as a header. |
+| trim-spaces | a string, if "true", then the callout trims leading and trailing spaces from the values in the CSV |
+
+Example:
+```xml
+<JavaCallout name='Java-ShredCsv'>
+  <Properties>
+    <Property name="trim-spaces">true</Property>
+  </Properties>
+  <ClassName>com.google.apigee.callouts.CsvShredder</ClassName>
+  <ResourceURL>java://apigee-csv-parse-20210707.jar</ResourceURL>
+</JavaCallout>
+```
+
+See the [example bundle](./bundle) for more configuration examples.
 
 
 ## Using these callouts

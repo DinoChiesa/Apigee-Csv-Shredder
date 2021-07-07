@@ -43,12 +43,16 @@ public class CsvShredder extends CalloutBase implements Execution {
     return "csv";
   }
 
+  private Boolean getTrimSpaces(MessageContext msgCtxt) throws Exception {
+    return _getBooleanProperty(msgCtxt, "trim-spaces", false);
+  }
+
   private List<String> getFieldList(MessageContext msgCtxt) throws IllegalStateException {
     String fieldlist = (String) this.properties.get("fieldlist");
     if (fieldlist == null || fieldlist.equals("")) {
       return null; // assume the first row gives the field list
     }
-    fieldlist = resolvePropertyValue(fieldlist, msgCtxt);
+    fieldlist = resolveVariableReferences(fieldlist, msgCtxt);
     if (fieldlist == null || fieldlist.equals("")) {
       return null; // assume the first row gives the field list
     }
@@ -75,10 +79,14 @@ public class CsvShredder extends CalloutBase implements Execution {
     // 2. read the CSV, maybe treat the first line as a header
     Map<String, Object> map = new HashMap<String, Object>();
     Iterable<CSVRecord> records = null;
+    CSVFormat format = CSVFormat.DEFAULT;
+    if (getTrimSpaces(msgCtxt)) {
+      format = format.withIgnoreSurroundingSpaces(true);
+    }
     if (list == null) {
-      records = CSVFormat.DEFAULT.withHeader().parse(in);
+      records = format.withHeader().parse(in);
     } else {
-      records = CSVFormat.DEFAULT.withHeader(list.toArray(new String[1])).parse(in);
+      records = format.withHeader(list.toArray(new String[1])).parse(in);
     }
 
     // 3. process each record in the CSV, convert to an element in a map
