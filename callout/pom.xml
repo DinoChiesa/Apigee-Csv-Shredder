@@ -120,9 +120,13 @@ do it manually by running these commands:
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.1</version>
         <configuration>
+          <showDeprecation>true</showDeprecation>
           <source>${java.version}</source>
           <target>${java.version}</target>
-          <compilerArgument>-Xlint:unchecked</compilerArgument>
+          <compilerArgs>
+            <!-- <arg>-verbose</arg> -->
+            <arg>-Xlint:unchecked,deprecation</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
 

@@ -1,9 +1,18 @@
-// CsvShredderTest.java
-// ------------------------------------------------------------------
+// Copyright 2016 Apigee Corp, 2017-2022 Google LLC.
 //
-// Last saved: <2021-July-07 16:36:19>
-// ------------------------------------------------------------------
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// ------------------------------------------------------------------
 
 package com.google.apigee.callouts;
 
@@ -40,24 +49,24 @@ public class CsvShredderTest {
 
     msgCtxt =
         new MockUp<MessageContext>() {
-          private Map variables;
+          private Map<String, Object> variables;
 
           public void $init() {
-            variables = new HashMap();
+            variables = new HashMap<String, Object>();
           }
 
           @Mock()
-          public <T> T getVariable(final String name) {
+          public Object getVariable(final String name) {
             if (variables == null) {
-              variables = new HashMap();
+              variables = new HashMap<String, Object>();
             }
-            return (T) variables.get(name);
+            return variables.get(name);
           }
 
           @Mock()
           public boolean setVariable(final String name, final Object value) {
             if (variables == null) {
-              variables = new HashMap();
+              variables = new HashMap<String, Object>();
             }
             variables.put(name, value);
             return true;
@@ -66,7 +75,7 @@ public class CsvShredderTest {
           @Mock()
           public boolean removeVariable(final String name) {
             if (variables == null) {
-              variables = new HashMap();
+              variables = new HashMap<String, Object>();
             }
             if (variables.containsKey(name)) {
               variables.remove(name);
@@ -102,6 +111,25 @@ public class CsvShredderTest {
     CsvShredder callout = new CsvShredder(properties);
     ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
     Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+    @SuppressWarnings("unchecked")
+    Map<String, Map<String, String>> result =
+        (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
+    Assert.assertEquals(result.size(), 5);
+    Assert.assertNotNull(result.get("6001 MCMAHON DR"));
+    Assert.assertEquals(result.get("6001 MCMAHON DR").get("price"), "81900");
+  }
+
+  @Test
+  public void providedHeader() throws Exception {
+    messageContent = readAllText("sample5-No-Header.csv");
+    Properties properties = new Properties();
+    properties.put(
+        "fieldlist",
+        "street,city,zip,state,beds,baths,sqft,type,sale_date,price,latitude,longitude");
+    CsvShredder callout = new CsvShredder(properties);
+    ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
+    Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+    @SuppressWarnings("unchecked")
     Map<String, Map<String, String>> result =
         (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
     Assert.assertEquals(result.size(), 5);
@@ -120,6 +148,7 @@ public class CsvShredderTest {
 
     Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "1000");
 
+    @SuppressWarnings("unchecked")
     Map<String, Map<String, String>> result =
         (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
 
@@ -133,6 +162,26 @@ public class CsvShredderTest {
   }
 
   @Test
+  public void keepSpaces() throws Exception {
+    messageContent = readAllText("sample1000.csv");
+    Properties properties = new Properties();
+    properties.put("trim-spaces", "false");
+    CsvShredder callout = new CsvShredder(properties);
+    ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
+    Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
+
+    Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "1000");
+
+    @SuppressWarnings("unchecked")
+    Map<String, Map<String, String>> result =
+        (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
+
+    Assert.assertEquals(result.size(), 1000);
+    Assert.assertNotNull(result.get("000201"));
+    Assert.assertEquals(result.get("000201").get(" RAND"), " 30832");
+  }
+
+  @Test
   public void rulesReadList() throws Exception {
     messageContent = readAllText("sample37.csv");
     Properties properties = new Properties();
@@ -141,6 +190,7 @@ public class CsvShredderTest {
     ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
     Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
     Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "37");
+    @SuppressWarnings("unchecked")
     List<Map<String, String>> result =
         (List<Map<String, String>>) msgCtxt.getVariable("csv_result_java");
     Assert.assertEquals(result.size(), 37);
@@ -160,6 +210,7 @@ public class CsvShredderTest {
     ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
     Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
     Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "4");
+    @SuppressWarnings("unchecked")
     Map<String, Map<String, String>> result =
         (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
     Assert.assertEquals(result.size(), 4);
@@ -181,6 +232,7 @@ public class CsvShredderTest {
     ExecutionResult actualResult = callout.execute(msgCtxt, exeCtxt);
     Assert.assertEquals(actualResult, ExecutionResult.SUCCESS);
     Assert.assertEquals(msgCtxt.getVariable("csv_rows_read"), "37");
+    @SuppressWarnings("unchecked")
     Map<String, Map<String, String>> result =
         (Map<String, Map<String, String>>) msgCtxt.getVariable("csv_result_java");
     Assert.assertEquals(result.size(), 37);

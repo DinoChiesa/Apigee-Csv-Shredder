@@ -4,7 +4,7 @@
 // callout is very simple - it shreds a CSV, then sets a Java Map into a
 // context variable, and then returns SUCCESS.
 //
-// Copyright 2016 Apigee Corp, 2017-2021 Google LLC.
+// Copyright 2016 Apigee Corp, 2017-2022 Google LLC.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -108,6 +108,20 @@ public class CsvShredder extends CalloutBase implements Execution {
     return sb.toString();
   }
 
+  CSVFormat getCsvReader(List<String> fieldList, boolean trimSpaces) {
+    CSVFormat.Builder builder = CSVFormat.Builder.create();
+    if (trimSpaces) {
+      builder.setIgnoreSurroundingSpaces(true);
+    }
+
+    if (fieldList == null) {
+      builder.setHeader();
+    } else {
+      builder.setHeader(fieldList.toArray(new String[1]));
+    }
+    return builder.build();
+  }
+
   public ExecutionResult execute0(final MessageContext msgCtxt) throws Exception {
     Message msg = msgCtxt.getMessage();
     List<String> fieldList = getFieldList(msgCtxt);
@@ -119,17 +133,7 @@ public class CsvShredder extends CalloutBase implements Execution {
     // https://commons.apache.org/proper/commons-csv/apidocs/org/apache/commons/csv/CSVFormat.html
 
     // 2. read the CSV, maybe treat the first line as a header
-    Map<String, Object> map = new HashMap<String, Object>();
-    Iterable<CSVRecord> records = null;
-    CSVFormat format = CSVFormat.DEFAULT;
-    if (getTrimSpaces(msgCtxt)) {
-      format = format.withIgnoreSurroundingSpaces(true);
-    }
-    if (fieldList == null) {
-      records = format.withHeader().parse(in);
-    } else {
-      records = format.withHeader(fieldList.toArray(new String[1])).parse(in);
-    }
+    Iterable<CSVRecord> records = getCsvReader(fieldList, getTrimSpaces(msgCtxt)).parse(in);
 
     OutputFormat desiredOutputFormat = getOutputFormat(msgCtxt);
     if (desiredOutputFormat == OutputFormat.LIST) {
@@ -151,6 +155,7 @@ public class CsvShredder extends CalloutBase implements Execution {
       msgCtxt.setVariable(varName("result_json"), jsonResult);
     } else if (desiredOutputFormat == OutputFormat.MAP) {
       // 3. process each record in the CSV, convert to an element in a map
+      Map<String, Object> map = new HashMap<String, Object>();
       Boolean contrivePk = getContrivePrimaryKey(msgCtxt);
       int c = 0;
       for (CSVRecord record : records) {
