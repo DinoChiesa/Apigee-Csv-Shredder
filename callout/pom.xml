@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.apigee.callout</groupId>
   <artifactId>apigee-csv-parse</artifactId>
-  <version>20210707</version>
+  <version>20220104</version>
   <name>ApigeeJavaCsv</name>
   <url>http://maven.apache.org</url>
   <packaging>jar</packaging>
@@ -16,7 +16,7 @@
     <testng.version>6.8.7</testng.version> <!-- current: 6.9.4 -->
     <jackson.version>[2.9.10.7,)</jackson.version>
     <jmockit.version>1.7</jmockit.version>
-    <commons-csv.version>1.8</commons-csv.version>
+    <commons-csv.version>[1.8,)</commons-csv.version>
     <apiproxy.java.rsrc.dir>../bundle/apiproxy/resources/java</apiproxy.java.rsrc.dir>
   </properties>
 
@@ -141,11 +141,31 @@ do it manually by running these commands:
 
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.0.0</version>
         <executions>
           <execution>
-            <phase>package</phase>
+            <id>ant1</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
             <configuration>
-              <tasks>
+              <target>
+                <delete>
+                  <fileset dir="${apiproxy.java.rsrc.dir}"
+                           includes="*.jar" />
+                </delete>
+              </target>
+            </configuration>
+          </execution>
+          <execution>
+            <id>ant2</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
                 <copy todir="${apiproxy.java.rsrc.dir}">
                   <fileset dir="${project.build.directory}">
                     <include name="${project.build.finalName}.jar"/>
@@ -158,11 +178,8 @@ do it manually by running these commands:
                   </fileset>
                   <mapper type="flatten"/>
                 </copy>
-              </tasks>
+              </target>
             </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>

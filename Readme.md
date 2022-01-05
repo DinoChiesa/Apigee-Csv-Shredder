@@ -55,7 +55,7 @@ Example:
     <Property name="output-format">list</Property>
   </Properties>
   <ClassName>com.google.apigee.callouts.CsvShredder</ClassName>
-  <ResourceURL>java://apigee-csv-parse-20210707.jar</ResourceURL>
+  <ResourceURL>java://apigee-csv-parse-20220104.jar</ResourceURL>
 </JavaCallout>
 ```
 
